@@ -1,24 +1,7 @@
 # BasketAnalysis
 
-**TODO: Add description**
+Basket Analysis Package using a-priori algorithm.
+
+Also calculating Lift measure for more accurate associations (Taking into consideration how frequently an item appears in transactions)
 
 ## Installation
-
-If [available in Hex](https://hex.pm/docs/publish), the package can be installed as:
-
-  1. Add `basket_analysis` to your list of dependencies in `mix.exs`:
-
-    ```elixir
-    def deps do
-      [{:basket_analysis, "~> 0.1.0"}]
-    end
-    ```
-
-  2. Ensure `basket_analysis` is started before your application:
-
-    ```elixir
-    def application do
-      [applications: [:basket_analysis]]
-    end
-    ```
-
