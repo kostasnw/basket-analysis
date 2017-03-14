@@ -10,8 +10,8 @@ defmodule Print do
     IO.puts "#{first_product} -> #{second_product}\t#{support}\t#{confidence}\t#{lift}"
   end
 
-  def to_csv(sets) do
-    file = File.open!("output.csv", [:write, :utf8])
+  def to_csv(sets, target \\ "output.csv") do
+    file = File.open!(target, [:write, :utf8])
     IO.write file, CSV.dump_to_iodata([~w(Product Support Confidence Lift) | Enum.map(sets, &sets_to_csv(&1))])
   end
 

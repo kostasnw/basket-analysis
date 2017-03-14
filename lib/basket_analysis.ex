@@ -6,8 +6,8 @@ defmodule BasketAnalysis do
 
   def main(args \\ []) do
     {opts, _, _} = OptionParser.parse(args,
-          switches: [src: :string, support: :float],
-          aliases: [S: :src, s: :support]
+          switches: [src: :string, support: :float, target: :string],
+          aliases: [S: :src, s: :support, t: :target]
           )
     items = opts[:src] |> Data.load
     baskets = get_baskets items
@@ -15,13 +15,9 @@ defmodule BasketAnalysis do
       %{},
       baskets |> Enum.into([]),
       baskets,
-      get_support(
-        %{},
-        items |> Enum.map(&get_product(&1)) |> Enum.uniq,
-        baskets
-      )
+      items |> calculate_product_support(baskets, opts[:support])
     )
-    |> Print.to_csv
+    |> Print.to_csv(opts[:target])
   end
 
   defp get_sets(sets, [{_, items} | t], baskets, product_support) do
@@ -33,7 +29,11 @@ defmodule BasketAnalysis do
   end
 
   defp get_sets_from_basket(sets, [h | t], baskets, product_support) do
-    Map.put_new(sets, h, calculate_measures(h, baskets, product_support)) |> get_sets_from_basket(t, baskets, product_support)
+    if h |> Enum.all?(fn(x) -> product_support |> Map.has_key?(x) end) do
+      Map.put_new(sets, h, calculate_measures(h, baskets, product_support)) |> get_sets_from_basket(t, baskets, product_support)
+    else
+      sets |> get_sets_from_basket(t, baskets, product_support)
+    end
   end
 
   defp get_sets_from_basket(sets, [], _, _) do
@@ -44,11 +44,11 @@ defmodule BasketAnalysis do
     items |> Enum.group_by(&get_transaction_id(&1), &get_product(&1))
   end
 
-  defp get_product([name, _, _, _, _]) do
+  defp get_product([name, _]) do
     name
   end
 
-  defp get_transaction_id([_, transaction_id, _, _, _]) do
+  defp get_transaction_id([_, transaction_id]) do
     transaction_id
   end
 
@@ -108,6 +108,17 @@ defmodule BasketAnalysis do
       :lift,
       measures[:support]/(product_support[first_product] * product_support[second_product])
     )
+  end
+
+  defp calculate_product_support(items, baskets, support) do
+    get_support(
+      %{},
+      items
+        |> Enum.map(&get_product(&1))
+        |> Enum.uniq, baskets
+    )
+    |> Enum.filter(fn({_, v}) -> v > support end)
+    |> Enum.into(%{})
   end
 
 end
