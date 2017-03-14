@@ -1,15 +1,27 @@
 defmodule BasketAnalysis do
 
-  def list_items do
-    Data.print
+  def measure_support do
+    main
   end
 
-  def measure_support do
-    items = Data.load
-    products = items |> Enum.map(&get_product(&1)) |> Enum.uniq
+  def main(args \\ []) do
+    {opts, _, _} = OptionParser.parse(args,
+          switches: [src: :string, support: :float],
+          aliases: [S: :src, s: :support]
+          )
+    items = opts[:src] |> Data.load
     baskets = get_baskets items
-    product_support = get_support(%{}, products, baskets)
-    get_sets(%{}, baskets |> Enum.into([]), baskets, product_support) |> Print.to_csv
+    get_sets(
+      %{},
+      baskets |> Enum.into([]),
+      baskets,
+      get_support(
+        %{},
+        items |> Enum.map(&get_product(&1)) |> Enum.uniq,
+        baskets
+      )
+    )
+    |> Print.to_csv
   end
 
   defp get_sets(sets, [{_, items} | t], baskets, product_support) do

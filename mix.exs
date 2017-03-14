@@ -5,11 +5,13 @@ defmodule BasketAnalysis.Mixfile do
     [app: :basket_analysis,
      version: "0.1.0",
      elixir: "~> 1.3",
+     escript: escript,
      build_embedded: Mix.env == :prod,
      start_permanent: Mix.env == :prod,
-     deps: deps(),
-     default_task: "measure_support"]
+     deps: deps()]
   end
+
+  def escript, do: [main_module: BasketAnalysis]
 
   # Configuration for the OTP application
   #

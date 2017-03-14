@@ -1,15 +1,15 @@
 defmodule Data do
   alias NimbleCSV.RFC4180, as: CSV
 
-  def load do
-    File.read!("lib/items.csv")
+  def load(src) do
+    File.read!(src)
     |> parse
     |> filter
     |> normalize
   end
 
-  def print do
-    load |> print
+  def print(src) do
+    load(src) |> print
   end
 
   defp parse(string) do
@@ -42,14 +42,5 @@ defmodule Data do
     string
     |> String.replace(",", "")
     |> String.to_integer
-  end
-
-  defp print(rows) do
-    IO.puts "\nProducts:"
-    Enum.each(rows, &print_to_console(&1))
-  end
-
-  defp print_to_console([name, transaction_id, revenue, uniq_purchases, quantity]) do
-    IO.puts "#{name} - #{transaction_id}: €#{:erlang.float_to_binary(revenue, decimals: 2)}, quantity: #{quantity}, unique purchases: #{uniq_purchases}"
   end
 end
