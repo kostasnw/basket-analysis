@@ -10,7 +10,9 @@ defmodule BasketAnalysis do
           aliases: [S: :src, s: :support, t: :target]
           )
     items = opts[:src] |> Data.load
+    "File loaded" |> IO.puts
     baskets = get_baskets items
+    "Got Baskets" |> IO.puts
     get_sets(
       %{},
       baskets |> Enum.into([]),
@@ -21,6 +23,7 @@ defmodule BasketAnalysis do
   end
 
   defp get_sets(sets, [{_, items} | t], baskets, product_support) do
+    "Calculating sets - Items left: #{Enum.count t} | Set size: #{Map.size sets}" |> IO.puts
     sets |> get_sets_from_basket(Enum.chunk(items, 2, 1), baskets, product_support) |> get_sets(t, baskets, product_support)
   end
 
@@ -53,6 +56,7 @@ defmodule BasketAnalysis do
   end
 
   defp get_support(support, [h | t], baskets) do
+    IO.puts "Calculating support - Items remaining: #{Enum.count t} | Support set size: #{Map.size support}"
     Map.put(support, h, calculate_support(h, baskets)) |> get_support(t, baskets)
   end
 
